@@ -7,7 +7,7 @@ disp("Matriz A de 6x6: ");
 disp(A);
 disp("Determinante de A: " + detA);
 disp(" ");
-disp("Factorización LU de A: ")
+disp("FactorizaciÃ³n LU de A: ")
 luA = lu(A);
 disp(luA);
 
