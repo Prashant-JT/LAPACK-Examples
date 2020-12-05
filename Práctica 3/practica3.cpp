@@ -86,6 +86,12 @@ public:
 		float* vt = new float[ldvt];
 		res = LAPACKE_sgesvd(layout, jobu, jobvt, m, n, matrixOver, lda, s, u, ldu, vt, ldvt, superb);
 		utils.printMatrix(matrixOver, m, n);
+		printf("\t\tVector U:\n");
+		utils.printMatrix(u, 1, ldu);
+		printf("\t\tVector S:\n");
+		utils.printMatrix(s, 1, m);
+		printf("\t\tVector VT:\n");
+		utils.printMatrix(vt, 1, ldvt);
 	}
 
 	void autos(char jobz, char uplo) {
