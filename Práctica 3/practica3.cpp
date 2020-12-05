@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
 	string matSym =
 		"43 59 51 50 39 54 "
 		"59 118 103 101 61 97 "
-		"51 103 121 93 56 10 "
+		"51 103 121 93 56 102 "
 		"50 101 93 111 69 99 "
 		"39 61 56 69 77 86 "
 		"54 97 102 99 86 134 ";
@@ -176,7 +176,7 @@ int main(int argc, char* argv[]) {
 
 	Se pide ambos, por tanto se pasa jobz='V', uplo=L o U (traspuestas).
 	Como jobz='V', la matriz contiene los autovectores.
-	Los autovalores se sitúan en el vector "w".
+	Los autovalores se sitÃºan en el vector "w".
 	*/
 
 	printf("\n\nEjercicio 3_D (Autovalores y Autovectores):\n");
