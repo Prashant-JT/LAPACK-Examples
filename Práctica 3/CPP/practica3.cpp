@@ -8,7 +8,7 @@ using namespace std;
 
 class Utils {
 public:
-	void printMatrix(float* mat, int m, int n) {
+	void printMatrix(double* mat, int m, int n) {
 		printf("\t\t");
 		for (int i = 0; i < m * n; i++)
 		{
@@ -25,14 +25,20 @@ public:
 		printf("\n");
 	}
 
-	float* clone(float* matrix, int size) {
-		float* res = new float[size];
-		memcpy(res, matrix, sizeof(float) * size);
+	double* clone(double* matrix, int size) {
+		double* res = new double[size];
+		memcpy(res, matrix, sizeof(double) * size);
 		return res;
 	}
 
-	float* processMatrix(string mat, int size) {
-		float* vect = new float[size];
+	lapack_int* cloneInt(lapack_int* matrix, int size) {
+		lapack_int* res = new lapack_int[size];
+		memcpy(res, matrix, sizeof(lapack_int) * size);
+		return res;
+	}
+
+	double* processMatrix(string mat, int size) {
+		double* vect = new double[size];
 		int p = 0;
 		string temp = "";
 
@@ -48,11 +54,22 @@ public:
 		}
 		return vect;
 	}
+
+	double* getIdentity(int size) {
+		double* matrix = new double[(int)(size)];
+		for (int i = 0; i < size * size; i++) {
+			matrix[i] = 0.0;
+		}
+		for (int i = 0; i < size; i++) {
+			matrix[size * i + i] = 1.0;
+		}
+		return matrix;
+	}
 };
 
 class funcion2 {
 public:
-	funcion2(float* matrix, int m_, int n_) {
+	funcion2(double* matrix, int m_, int n_) {
 		layout = LAPACK_ROW_MAJOR;
 		m = m_;
 		n = n_;
@@ -61,30 +78,30 @@ public:
 	}
 	
 	void cholesky(char uplo) {
-		float* matrixOver = cloneMatrix();
+		double* matrixOver = utils.clone(matrixC, m * n);
 		lapack_int res;
-		res = LAPACKE_spotrf(layout, uplo, n, matrixOver, lda);
+		res = LAPACKE_dpotrf(layout, uplo, n, matrixOver, lda);
 		utils.printMatrix(matrixOver, m, n);
 	}
 
 	void QR() {
-		float* matrixOver = cloneMatrix();
+		double* matrixOver = utils.clone(matrixC, m * n);
 		lapack_int res;
-		float * tau = new float[n];
-		res = LAPACKE_sgeqrf(layout, m, n, matrixOver, lda, tau);
+		double* tau = new double[n];
+		res = LAPACKE_dgeqrf(layout, m, n, matrixOver, lda, tau);
 		utils.printMatrix(matrixOver, m, n);
 	}
 
 	void SVD(char jobu, char jobvt) {
-		float* matrixOver = cloneMatrix();	
-		float* s = new float[m];
-		float* superb = new float[n];
+		double* matrixOver = utils.clone(matrixC, m * n);
+		double* s = new double[m];
+		double* superb = new double[n];
 		lapack_int res, ldvt, ldu;
 		ldvt = lda;
 		ldu = lda;
-		float* u = new float[ldu];
-		float* vt = new float[ldvt];
-		res = LAPACKE_sgesvd(layout, jobu, jobvt, m, n, matrixOver, lda, s, u, ldu, vt, ldvt, superb);
+		double* u = new double[ldu];
+		double* vt = new double[ldvt];
+		res = LAPACKE_dgesvd(layout, jobu, jobvt, m, n, matrixOver, lda, s, u, ldu, vt, ldvt, superb);
 		utils.printMatrix(matrixOver, m, n);
 		printf("\t\tVector U:\n");
 		utils.printMatrix(u, 1, ldu);
@@ -95,10 +112,10 @@ public:
 	}
 
 	void autos(char jobz, char uplo) {
-		float* matrixOver = cloneMatrix();
-		float* w = new float[m];
+		double* matrixOver = utils.clone(matrixC, m * n);
+		double* w = new double[m];
 		lapack_int res;
-		res = LAPACKE_ssyev(layout, jobz, uplo, n, matrixOver, lda, w);
+		res = LAPACKE_dsyev(layout, jobz, uplo, n, matrixOver, lda, w);
 		printf("\t  Autovectores:\n");
 		utils.printMatrix(matrixOver, m, n);
 		printf("\t  Autovalores:\n");
@@ -106,12 +123,8 @@ public:
 	}
 private:
 	lapack_int m, n, lda, layout;
-	float* matrixC;	
+	double* matrixC;	
 	Utils utils;
-
-	float* cloneMatrix() {
-		return utils.clone(matrixC, m * n);
-	}
 };
 
 int main(int argc, char* argv[]) {
@@ -125,7 +138,7 @@ int main(int argc, char* argv[]) {
 		"39 61 56 69 77 86 "
 		"54 97 102 99 86 134 ";
 
-	float* matSxS = utils.processMatrix(matSym, m * n);
+	double* matSxS = utils.processMatrix(matSym, m * n);
 	printf("Matriz a operar:\n");
 	utils.printMatrix(matSxS, m, n);
 
