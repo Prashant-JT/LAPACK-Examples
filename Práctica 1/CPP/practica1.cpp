@@ -8,7 +8,7 @@ using namespace std;
 
 class Utils {
 public:
-	void printMatrix(float* mat, int m, int n) {
+	void printMatrix(double* mat, int m, int n) {
 		printf("\t\t");
 		for (int i = 0; i < m * n; i++)
 		{
@@ -24,14 +24,20 @@ public:
 		printf("\n");
 	}
 
-	float* clone(float* matrix, int size) {
-		float* res = new float[size];
-		memcpy(res, matrix, sizeof(float) * size);
+	double * clone(double* matrix, int size) {
+		double* res = new double[size];
+		memcpy(res, matrix, sizeof(double) * size);
 		return res;
 	}
 
-	float* processMatrix(string mat, int size) {
-		float* vect = new float[size];
+	lapack_int * cloneInt(lapack_int* matrix, int size) {
+		lapack_int* res = new lapack_int[size];
+		memcpy(res, matrix, sizeof(lapack_int) * size);
+		return res;
+	}
+
+	double* processMatrix(string mat, int size) {
+		double* vect = new double[size];
 		int p = 0;
 		string temp = "";
 
@@ -47,11 +53,22 @@ public:
 		}
 		return vect;
 	}
+
+	double* getIdentity(int size) {
+		double* matrix = new double[(int)(size)];
+		for (int i = 0; i < size*size; i++) {
+			matrix[i] = 0.0;
+		}
+		for (int i = 0; i < size; i++) {
+			matrix[size * i + i] = 1.0;
+		}
+		return matrix;
+	}
 };
 
 class funcion2 {
 public:
-	funcion2(float* matrix, int m_, int n_) {
+	funcion2(double* matrix, int m_, int n_) {
 		layout = LAPACK_ROW_MAJOR;
 		m = m_;
 		n = n_;
@@ -63,32 +80,38 @@ public:
 
 	void LU() {
 		lapack_int res;		
-		res = LAPACKE_sgetrf(layout, m, n, matrixOver, lda, ipiv);
+		res = LAPACKE_dgetrf(layout, m, n, matrixOver, lda, ipiv);
 		utils.printMatrix(matrixOver, m, n);
 	}
 
 	void determinante() {
-		float det = 1;
+		double det = 1;
 		for (int i = 0; i < m; i++) {
 			det *= matrixOver[m*i+i];
 		}
 		printf("\t\tDeterminante = %f", det);
 	}
 
-	void inversa() {
-		//NO SE COMO RESOLVER AX=I
+	void inversa(char trans) {
+		lapack_int res, nrhs, * ipivB, ldb;
+		nrhs = n;
+		ldb = n;
+		ipivB = utils.cloneInt(ipiv, n);
+		double* matrixB = utils.getIdentity(ldb);	
+		res = LAPACKE_dgetrs(layout, trans, n, nrhs, matrixOver, lda, ipivB, matrixB, ldb);
+		utils.printMatrix(matrixB, m, n);
 	}
 
-	void inversa_sgetri() {
+	void inversa_dgetri() {
 		lapack_int res;
-		res = LAPACKE_sgetri(layout, n, matrixOver, lda, ipiv);
+		res = LAPACKE_dgetri(layout, n, matrixOver, lda, ipiv);
 		utils.printMatrix(matrixOver, m, n);
 	}
 
 private:
 	lapack_int m, n, lda, * ipiv, layout;
-	float* matrixC;
-	float* matrixOver;
+	double* matrixC;
+	double* matrixOver;
 	Utils utils;
 };
 
@@ -103,7 +126,7 @@ int main(int argc, char* argv[]) {
 		"4 5 4 1 7 5 "
 		"5 8 3 9 6 1 ";
 
-	float* matSxS = utils.processMatrix(mat, m*n);
+	double* matSxS = utils.processMatrix(mat, m*n);
 	printf("Matriz a operar:\n");
 	utils.printMatrix(matSxS, m, n);
 
@@ -114,14 +137,18 @@ int main(int argc, char* argv[]) {
 	printf("\n\nEjercicio 2_B (Determinante):\n");
 	funcion2.determinante();
 
-	printf("\n\nEjercicio 2_C (Inversa):\n");
-	funcion2.inversa();
+	/*
+	TRANS is CHARACTER*1
+          Specifies the form of the system of equations:
+          = 'N':  A * X = B  (No transpose)
+          = 'T':  A**T* X = B  (Transpose)
+          = 'C':  A**T* X = B  (Conjugate transpose = Transpose)
+	*/
+	printf("\n\nEjercicio 2_C (Inversa AX=I):\n");
+	funcion2.inversa('N');
 
-	printf("\n\nEjercicio 2_D (Inversa con SGETRI):\n");
-	funcion2.inversa_sgetri();
-
-	//printf("\n\nEjercicio 3:\n");
-	//funcion3();
+	printf("\n\nEjercicio 2_D (Inversa con DGETRI):\n");
+	funcion2.inversa_dgetri();
 
 	char a = std::getchar();
 	return 0;
