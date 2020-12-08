@@ -12,7 +12,7 @@ luA = lu(A);
 disp(luA);
 
 function X = randomMatrix(m, n)
-    X = randi([1,10], m,n);
+    X = double(randi([1,10], m,n));
 end
 
 %{
