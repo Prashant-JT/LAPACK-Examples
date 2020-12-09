@@ -177,38 +177,46 @@ public:
 	}
 
 	void dgesvGeneral() {
-		double* matrixOver = utils.clone(matrixB, m * n);
-		double* matrixZ = utils.clone(matrixZeros, m * n);
-		lapack_int* ipiv = new lapack_int[n];
+		lapack_int* ipiv;
+		double* matrixOver;
+		double* matrixZ;
 		int res;
 
 		double start, fin = dsecnd();
 		start = dsecnd();
-		for(int i = 0; i < 100000000; i++) {
+		for(int i = 0; i < 1000000; i++) {
+			matrixOver = utils.clone(matrixB, m * n);
+			matrixZ = utils.clone(matrixZeros, m * n);
+			ipiv = new lapack_int[n];
 			res = LAPACKE_dgesv(layout, n, nhrs, matrixOver, lda, ipiv, matrixZ, ldb);
 		}
 		fin = (dsecnd() - start);
-		double totalTime = fin / 100000000;
+		double totalTime = fin / 1000000;
 
 		printf("\n Matriz general (INFO = %d)", res);
 		printf(" | Tiempo promedio en segundos = %f\n", totalTime);
-		utils.printMatrix(matrixOver, n, n); 
+
+		res = LAPACKE_dgesv(layout, n, nhrs, matrixOver, lda, ipiv, matrixZ, ldb);
+		utils.printMatrix(matrixOver, n, n);
 	}
 
 	void dgesvBanda() {
-		double* matrixOver = utils.clone(compactA, m * n);
-		double* matrixZ = utils.clone(matrixZeros, m * n);
-		lapack_int* ipiv = new lapack_int[n];
-		int ldab = 4;
+		lapack_int* ipiv;
+		double* matrixOver;
+		double* matrixZ;
 		int res;
+		int ldab = 4;
 
 		double start, fin = dsecnd();
 		start = dsecnd();
-		for (int i = 0; i < 100000000; i++) {
-			res = LAPACKE_dgbsv(layout, n, 1, 1, nhrs, matrixOver, ldab, ipiv, matrixZ, ldb);
+		for (int i = 0; i < 1000000; i++) {
+			matrixOver = utils.clone(compactA, m * n);
+			matrixZ = utils.clone(matrixZeros, m * n);
+			ipiv = new lapack_int[n];
+			res = LAPACKE_dgbsv(layout, n, 1, 1, nhrs, matrixOver, ldab, ipiv, matrixZ, ldb);	
 		}
 		fin = (dsecnd() - start);
-		double totalTime = fin / 100000000;
+		double totalTime = fin / 1000000;
 
 		printf("\n Matriz tridiagonal (INFO = %d)", res);
 		printf(" | Tiempo promedio en segundos = %f\n", totalTime);
@@ -254,7 +262,7 @@ int main(int argc, char* argv[]) {
 	printf("\n\nEjercicio 2_B (matriz A compacta):\n");
 	funcion2.matrixCompact();
 
-	printf("\n\nEjercicio 2_C (matriz A (LAPACKE_dgesv)):\n");
+	printf("\n\nEjercicio 2_C y 2_D (matriz A (LAPACKE_dgesv)):\n");
 	funcion2.dgesvGeneral();
 	funcion2.dgesvBanda();
 
