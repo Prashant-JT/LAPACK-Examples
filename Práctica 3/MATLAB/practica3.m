@@ -4,7 +4,7 @@ global matSym m n;
 
 m = 6; n = 6;
 
-matSym = single([43, 59,  51,  50,  39, 54;
+matSym = double([43, 59,  51,  50,  39, 54;
                 59, 118, 103, 101, 61, 97;
                 51, 103, 121, 93,  56, 102;
                 50, 101, 93,  111, 69, 99;
@@ -63,8 +63,8 @@ function autos()
 end
 
 %{
-Función para generar matrices cuadradas 
-de enteros, simétricas y definidas positivas.
+FunciÃ³n para generar matrices cuadradas 
+de enteros, simÃ©tricas y definidas positivas.
 function A = randomMatrix(n)
     A = randi(n,n);
     A = A*A';
